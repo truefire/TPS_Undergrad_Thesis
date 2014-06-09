@@ -1,0 +1,55 @@
+<game name="Feed the pig (20-3)">
+	<boards>
+		<board label="food">
+			<space>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20</space>
+			<width>1</width>
+			<init>
+			0
+			</init>
+		</board>
+		<board label="prev">
+			<space>0,1,2,3,4</space>
+			<width>1</width>
+			<init>
+			0
+			</init>
+		</board>
+	</boards>
+
+	<players>
+		<player type="Standard">
+			<pid>1,2</pid>
+			<moves>
+				<move name="feed">
+					<params>
+						<param name="v">1,2,3,4</param>
+					</params>
+					<validate>
+						bool b = (1 &#x003C;= v) &amp;&amp; (v &#x003C;= 4);
+						b = b &amp;&amp; (v != boards_prev[0]);
+						return b;
+					</validate>
+					<execute>
+						boards_food[0] += v;
+						boards_prev[0] = v;
+						cout<<"Player " << std::to_string(current_pid) + " fed the piggy " << std::to_string(v) << " food.");
+					</execute>
+				</move>
+			</moves>
+		</player>
+	</players>
+
+	<control>
+	</control>
+	
+	<win>
+		int winner = 0;
+		if (boards_food[0] > 20)
+		{
+			winner = 3 - current_pid;
+			cout<<"The piggy exploded! Player " << std::to_string(winner) << " wins!"<<endl;
+		}
+		
+		return winner;
+	</win>
+</game>

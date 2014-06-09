@@ -1,0 +1,97 @@
+<game name="Tic-Tac-Toe">
+	<boards>
+		<board label="main">
+			<space>0,1,2</space>
+			<width>3</width>
+			<init>
+			2,2,2
+			2,2,2
+			2,2,2
+			</init>
+		</board>
+	</boards>
+
+	<players>
+		<player type="Standard">
+			<moves>
+				<move name="place">
+					<params>
+						<param name="x">0,1,2</param>
+						<param name="y">0,1,2</param>
+					</params>
+					<validate>
+						<![CDATA[
+						return (*boards_main)[x + 3*y] == 2;
+						]]>
+					</validate>
+					<execute>
+						<![CDATA[
+						(*boards_main)[x + 3*y] = current_pid;
+						if (active) {std::cout << "msg: Player " << game_util::mkStr(current_pid) + " played at (" << game_util::mkStr(x) << "," << y << ")." << std::endl;}
+						game_util::endTurn(this);
+						]]>
+					</execute>
+				</move>
+			</moves>
+		</player>
+	</players>
+	
+	<playerInstances>"Standard", "Standard"</playerInstances>
+
+	<util>
+	<![CDATA[
+
+namespace game_util
+{
+
+	std::string mkStr ( int i )
+	{
+		std::stringstream ss;
+		ss << i;
+		return ss.str();
+	}
+	
+	void endTurn(game* g)
+	{
+		g->current_pid = (g->current_pid + 1) % g->num_players;
+	}
+	
+}
+	]]>
+	</util>
+	
+	<win>
+	<![CDATA[		
+		int winner = -1;
+		std::vector<int> main = *boards_main;
+		
+		//Check all 8  possible win positions
+		     if (main[0] == main[4] && main[4] == main[8] && main[0] != 2) { winner = main[0]; }
+		else if (main[2] == main[4] && main[4] == main[6] && main[2] != 2) { winner = main[2]; }
+		
+		else if (main[0] == main[3] && main[3] == main[6] && main[0] != 2) { winner = main[0]; }
+		else if (main[1] == main[4] && main[4] == main[7] && main[1] != 2) { winner = main[1]; }
+		else if (main[2] == main[5] && main[5] == main[8] && main[2] != 2) { winner = main[2]; }
+		
+		else if (main[0] == main[1] && main[1] == main[2] && main[0] != 2) { winner = main[0]; }
+		else if (main[3] == main[4] && main[4] == main[5] && main[3] != 2) { winner = main[3]; }
+		else if (main[6] == main[7] && main[7] == main[8] && main[6] != 2) { winner = main[6]; }
+		
+		//If the winner was not found, check to see if the game is a draw
+		if (winner == -1)
+		{
+			bool done = true;
+			int i = 0;
+			while (i < 9)
+			{
+				if (main[i] == 2) { done = false; break; }
+				i++;
+			}
+			if (done == true) { winner = -2; }
+		}
+		
+		//Return the winner
+		return winner;
+	]]>
+	</win>
+</game>

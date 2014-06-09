@@ -1,0 +1,82 @@
+<game name="Feed the pig (20-3)">
+	<boards>
+		<board label="food">
+			<space>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24</space>
+			<width>1</width>
+			<init>
+			0
+			</init>
+		</board>
+		<board label="prev">
+			<space>0,1,2,3,4</space>
+			<width>1</width>
+			<init>
+			0
+			</init>
+		</board>
+	</boards>
+
+	<players>
+		<player type="Standard">
+			<moves>
+				<move name="feed">
+					<params>
+						<param name="v">1,2,3,4</param>
+					</params>
+					<validate>
+						<![CDATA[
+						bool b = (1 <= v) && (v <= 4);
+						b = b && (v !=(*boards_prev)[0]);
+						return b;
+						]]>
+					</validate>
+					<execute>
+						<![CDATA[
+						(*boards_food)[0] += v;
+						(*boards_prev)[0] = v;
+						if (active) {std::cout << "msg: Player " << game_util::mkStr(current_pid) + " fed the piggy " << game_util::mkStr(v) << " food." << std::endl;}
+						game_util::endTurn(this);
+						]]>
+					</execute>
+				</move>
+			</moves>
+		</player>
+	</players>
+	
+	<playerInstances>"Standard", "Standard"</playerInstances>
+
+	<util>
+	<![CDATA[
+
+namespace game_util
+{
+
+	std::string mkStr ( int i )
+	{
+		std::stringstream ss;
+		ss << i;
+		return ss.str();
+	}
+	
+	void endTurn(game* g)
+	{
+		g->current_pid = (g->current_pid + 1) % g->num_players;
+	}
+	
+}
+	]]>
+	</util>
+	
+	<win>
+	<![CDATA[
+		int winner = -1;
+		if (20 < (*boards_food)[0])
+		{
+			winner = current_pid;
+			if (active) {std::cout << "msg: The piggy exploded! Player " << game_util::mkStr(winner) << " wins!" <<std::endl;}
+		}
+		
+		return winner;
+	]]>
+	</win>
+</game>

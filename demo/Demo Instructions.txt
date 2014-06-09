@@ -1,0 +1,76 @@
+==Preface==
+
+The software and this demo was tested on Win7 64-bit. 
+Not supported on other environments.
+
+Layout of this folder:
+	data: important secondary files used by the program internally
+	infiles: game description and controller description files to be used as input
+	generator.exe: the actual program that is the focus of this demo
+	timecmd.bat: A windows bat implementation similar to the unix time command
+	             syntax is: timecmd.bat <command>
+
+Contents of infiles:
+	FeedThePig.gdf: Defines the game "feed the pig". Players take turn feeding a pig 
+		between 1 and 4 food, with the constraint that you cannot feed it the same 
+		amount your oponent just fed it. When the pig reaches 21 or more food, it 
+		explodes, causing the player who fed it last to lose. At perfect play, this
+		game is a forced win by the second player.
+	TicTacToe.gdf: Defines the game "tic-tac-toe", with which you are probably already
+		familliar. At perfect play, the result is always a draw.
+	Controllers.cdf: Defines several player controllers written to work with arbitrary games.
+	FeedThePigStrategy.cdf: Defines one controller written specifically for Feed The Pig.
+	
+This demo does not provide a comprehensive view of the functionality of the program, 
+but serves to show that the program does, in fact, work as intended.
+
+The program requires the presence of and ability to access g++ via system(), as well as
+permissions to read, write, and create files and directores.
+
+Note that players are zero-inexed, so the first player is "Player 0", and so on.
+
+
+
+==Demo instructions==
+
+First, we will use generator.exe to produce two more executables. tic.exe will be able
+to play tic-tac-toe with the generalized controllers. ftp.exe will be able to play feed the pig with thefeed-the-pig specific controller alone.
+
+ >generator.exe infiles/TicTacToe.gdf infiles/Controllers.cdf tic.exe
+ >generator.exe infiles/FeedThePig.gdf infiles/FeedThePigStrategy.cdf ftp.exe
+
+You can verify that the files (tic.exe and ftp.exe) were created. We will first demo ftp.exe
+
+ >ftp.exe FeedThePig_Standard FeedThePig_Standard
+
+Here we invoke the generated program ftp.exe, passing in the names of the controllers we
+want it to use for each player (in this case, FeedThePig_Standard -- the only controller
+we compiled this executable to use). You should see output of the game moves, in accordance
+with the specifications detailed in the design report. You can repeat the command to verify
+that the simulation turns out the same every time, as the controllers operate deterministically.
+
+Now we will demo tic.exe, first with a PlayerController and a RandomController, and then with a RandomController and an AcyclicMinimax controller.
+
+ >tic.exe PlayerController RandomController
+
+The player controller takes input from stdin (in this case, from the command line), in the
+format "<move name> <arg 1> <arg 2> ..." In this case, the only move available to you is "place",
+which places a piece at the specified x,y coordinates. An example move might be as follows:
+
+ >place 1 1
+ 
+The above move would attempt to place your marker in the middle square. You can verify that the
+player controller does in-fact accept your input and behave accordingly. You can also verify
+(through multiple trials if necessary) that the RandomController does in-fact behave randomly.
+
+ >tic.exe RandomController AcyclicMinimax
+
+This time, the first player will be randomly controlled, and the second will use the Minimax
+algorithm to determine its move choices. It may take a second to perform the calculations
+initially, but afterwards the game should play out almost instantly. Through multiple trials,
+you can verify that the Minimax controller never loses a game, as perfect play of tic-tac-toe
+will always result in a tie or win.
+
+You can perform as many additional tests as you feel necessary. For example, trying other 
+controllers or combinations of controllers, or even writing new game descriptions or controllers
+for testing.
